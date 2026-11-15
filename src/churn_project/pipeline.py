@@ -23,8 +23,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-# Permite localizar o pacote churn_project dentro de src/
-PROJECT_ROOT = str(Path(__file__).resolve().parents[1])
+# Localiza a pasta src mesmo quando o Databricks não define __file__
+SCRIPT_PATH = Path(sys._getframe().f_code.co_filename).resolve()
+PROJECT_ROOT = str(SCRIPT_PATH.parents[1])
+
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
