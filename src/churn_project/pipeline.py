@@ -122,12 +122,52 @@ def main():
             f"{CATALOG}.{SCHEMA}.bronze_customers"
         )
 
+    # --------------------------------------------------
+    # CAMADA SILVER
+    # --------------------------------------------------
+
+    print("Iniciando tratamento da camada Silver...")
+
+    from pyspark.sql import functions as F
+
+    # Lê os dados da Bronze
+    silver_df = spark.table(
+        f"{CATALOG}.{SCHEMA}.bronze_customers"
+    )
+
+    # Remove duplicidades usando o identificador técnico
+    silver_df = silver_df.dropDuplicates(["customer_id"])
+
+    # Limpa espaços e transforma strings vazias em valores nulos
+    for column, dtype in silver_df.dtypes:
+        if dtype == "string":
+            silver_df = silver_df.withColumn(
+                column,
+                F.when(
+                    F.trim(F.col(column)) == "",
+                    None
+                ).otherwise(F.trim(F.col(column)))
+            )
+
+    # Grava a camada Silver
+    silver_df.write \
+        .mode("overwrite") \
+        .format("delta") \
+        .saveAsTable(
+            f"{CATALOG}.{SCHEMA}.silver_customers"
+        )
+
+    # Converte para Pandas para continuar o treinamento
+    silver_pdf = silver_df.toPandas()
+
+    print(f"Silver concluída: {len(silver_pdf)} registros.")
+
     # 3. PREPARAÇÃO DOS DADOS
 
     print("Preparando features e variável alvo...")
 
-    X = make_feature_frame(pdf)
-    y = make_target(pdf)
+    X = make_feature_frame(silver_pdf)
+    y = make_target(silver_pdf)
 
     numeric = X.select_dtypes(
         include=["number", "bool"]
@@ -253,7 +293,7 @@ def main():
 
     print("Gerando previsões para os clientes...")
 
-    output = pdf[["customer_id"]].copy()
+    output = silver_pdf[["customer_id"]].copy()
 
     output["churn_prediction"] = best_model.predict(X)
 
