@@ -53,14 +53,27 @@ Tabelas criadas no Unity Catalog:
 
 ## Machine Learning
 
-Foram desenvolvidos e comparados dois modelos:
+Foram desenvolvidos e comparados dois modelos de classificação para previsão de churn:
 
 - Logistic Regression
 - Random Forest
 
-Os experimentos foram acompanhados pelo MLflow, permitindo comparar métricas como Accuracy, Precision, Recall, F1-score e ROC-AUC.
+Os experimentos foram registrados e acompanhados utilizando o MLflow, permitindo comparar diferentes métricas de desempenho.
 
-O Random Forest apresentou o melhor resultado geral considerando o F1-score.
+### Resultados
+
+| Modelo | Accuracy | Precision | Recall | F1-score | ROC-AUC |
+|---|---:|---:|---:|---:|---:|
+| Logistic Regression | 85.28% | 52.04% | 82.26% | 63.75% | 93.46% |
+| Random Forest | **94.16%** | **84.82%** | 76.61% | **80.51%** | **98.50%** |
+
+O **Random Forest apresentou o melhor desempenho geral**, principalmente considerando o F1-score, que aumentou de **63.75% para 80.51%** em relação à Logistic Regression.
+
+Além disso, o modelo apresentou **94.16% de Accuracy** e **98.50% de ROC-AUC**, indicando uma boa capacidade de distinguir clientes com maior e menor probabilidade de churn.
+
+A Logistic Regression apresentou um **Recall superior (82.26%)**, sendo capaz de identificar uma parcela maior dos clientes que realmente cancelaram. Por outro lado, o Random Forest apresentou maior Precision e F1-score, resultando em um melhor equilíbrio entre identificação de churn e redução de falsos positivos.
+
+Com base nesses resultados, o **Random Forest foi selecionado como modelo final** para geração das previsões utilizadas na camada Gold e no dashboard.
 
 ## Dashboard
 
