@@ -1,0 +1,16 @@
+bundle:
+  name: customer-churn-prediction
+
+include:
+  - resources/*.yml
+
+variables:
+  catalog:
+    default: workspace
+  schema:
+    default: churn_demo
+
+targets:
+  dev:
+    mode: development
+    default: true
